@@ -17,9 +17,11 @@ import 'package:finyx_mobile_app/cubits/bottom%20nav/navigation_cubit.dart';
 import 'package:finyx_mobile_app/cubits/home/chart_cubit.dart';
 import 'package:finyx_mobile_app/cubits/wallet/price_cubit.dart';
 import 'package:finyx_mobile_app/models/user_type.dart';
+import 'package:flutter/foundation.dart';
 import 'package:finyx_mobile_app/routes/app_routes.dart';
 
 Future<void> _initializeNotifications() async {
+  if (kIsWeb) return;
   const AndroidInitializationSettings initializationSettingsAndroid =
       AndroidInitializationSettings('@mipmap/ic_launcher');
 
@@ -38,7 +40,9 @@ void main() async {
   shared_preferences = await SharedPreferences.getInstance();
 
   final notificationsPlugin = FlutterLocalNotificationsPlugin();
-  await _initializeNotifications();
+  if (!kIsWeb) {
+    await _initializeNotifications();
+  }
 
   runApp(MyApp(notificationsPlugin: notificationsPlugin));
 }

@@ -1,4 +1,5 @@
 import 'package:finyx_mobile_app/cubits/wallet/shared_pref_helper.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
@@ -82,6 +83,7 @@ class PriceCubit extends Cubit<PriceState> {
   }
 
   Future<void> _showPriceNotification(String title, String message) async {
+    if (kIsWeb) return;
     const AndroidNotificationDetails androidNotificationDetails =
         AndroidNotificationDetails(
           'price_updates',

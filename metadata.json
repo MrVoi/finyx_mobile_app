@@ -1,0 +1,6 @@
+{
+  "name": "Finyx",
+  "description": "Personal and business financial planning, expense tracking, and wallet management with AI advisor.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

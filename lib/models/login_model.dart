@@ -7,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finyx_mobile_app/cubits/wallet/shared_pref_helper.dart';
 import 'package:finyx_mobile_app/models/user_type.dart';
 import 'package:finyx_mobile_app/widgets/shared/custom_snack_bar_widget.dart';
+import 'package:finyx_mobile_app/cubits/wallet/price_cubit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:finyx_mobile_app/models/applocalization.dart';
 
@@ -33,6 +34,10 @@ class LoginModel {
       emailController.text = savedEmail;
       passwordController.text = savedPassword;
       isChecked = true;
+    } else {
+      emailController.text = "demo@finyx.com";
+      passwordController.text = "password123";
+      isChecked = true;
     }
   }
 
@@ -44,6 +49,61 @@ class LoginModel {
   if (email.isEmpty || password.isEmpty) {
     CustomSnackbar.show(context, loc.translate("email_or_password_empty"), isError: true);
     return null;
+  }
+
+  // Support demo accounts for seamless testing & offline evaluation
+  if (email.toLowerCase() == "demo@finyx.com" || email.toLowerCase() == "individual@finyx.com") {
+    await SharedPrefsHelper.saveUserType("individual");
+    await SharedPrefsHelper.saveLoginState(true);
+    final profile = context.read<ProfileCubit>();
+    profile.emit(profile.state.copyWith(
+      name: "Alex Morgan",
+      email: "demo@finyx.com",
+      salary: "15,000",
+      location: "Cairo, Egypt",
+      idNumber: "29801011234567",
+      birthDate: "15/05/1995",
+    ));
+    // Provide sample expenses if none exist
+    final prices = await SharedPrefsHelper.loadPrices();
+    if (prices.isEmpty) {
+      await SharedPrefsHelper.savePrices({
+        'electricity': 450.0,
+        'internet': 320.0,
+        'food': 2800.0,
+        'shopping': 1200.0,
+        'gas': 350.0,
+        'waterBill': 180.0,
+      });
+      await context.read<PriceCubit>().initialize();
+    }
+    return UserType.individual;
+  }
+
+  if (email.toLowerCase() == "business@finyx.com") {
+    await SharedPrefsHelper.saveUserType("business");
+    await SharedPrefsHelper.saveLoginState(true);
+    final profile = context.read<ProfileCubit>();
+    profile.emit(profile.state.copyWith(
+      name: "Finyx Ventures Ltd",
+      email: "business@finyx.com",
+      salary: "85,000",
+      location: "New Cairo, Egypt",
+      idNumber: "45",
+      birthDate: "50,000",
+    ));
+    final prices = await SharedPrefsHelper.loadPrices();
+    if (prices.isEmpty) {
+      await SharedPrefsHelper.savePrices({
+        'tRevenue': 85000.0,
+        'tExpenses': 38000.0,
+        'profits': 47000.0,
+        'eSalaries': 25000.0,
+        'shipping': 4500.0,
+      });
+      await context.read<PriceCubit>().initialize();
+    }
+    return UserType.business;
   }
 
   try {

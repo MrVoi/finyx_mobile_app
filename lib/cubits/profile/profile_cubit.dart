@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:finyx_mobile_app/cubits/profile/profile_state.dart';
 import 'package:finyx_mobile_app/models/notification/notification_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -25,6 +26,7 @@ class ProfileCubit extends Cubit<ProfileState> {
   }
 
   Future<void> _setupNotifications() async {
+    if (kIsWeb) return;
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
@@ -44,6 +46,7 @@ class ProfileCubit extends Cubit<ProfileState> {
   }
 
   Future<void> _showLocalNotification(AppNotification notification) async {
+    if (kIsWeb) return;
     AndroidNotificationDetails androidNotificationDetails =
         AndroidNotificationDetails(
           'profile_updates', // Channel ID
